@@ -1,0 +1,31 @@
+{
+  "name": "fusion",
+  "version": "1.0.0",
+  "description": "...",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsx && webpack",
+    "debug": "node out/server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ndugger/fusion.git"
+  },
+  "author": "Nick Dugger",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ndugger/fusion/issues"
+  },
+  "homepage": "https://github.com/ndugger/fusion#readme",
+  "devDependencies": {
+    "@types/node": "^14.0.13",
+    "@types/ws": "^7.2.5",
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.5",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  },
+  "dependencies": {
+    "ws": "^7.3.0"
+  }
+}
