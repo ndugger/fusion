@@ -2,10 +2,10 @@
   "name": "fusion",
   "version": "1.0.0",
   "description": "...",
-  "main": "index.js",
+  "main": "pkg/",
   "scripts": {
-    "build": "tsx && webpack",
-    "debug": "node out/server"
+    "build": "tsc",
+    "debug": "webpack && node out/server"
   },
   "repository": {
     "type": "git",

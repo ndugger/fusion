@@ -18,7 +18,7 @@ export class Reactor<Emission = unknown> {
     /**
      * Asynchronously process next emission
      */
-    private async next(): Promise<Emission> {
+    private async continue(): Promise<Emission> {
 
         /**
          * If queue is empty, save marker while awaiting new emission
@@ -52,7 +52,7 @@ export class Reactor<Emission = unknown> {
      * Initialize queue
      */
     public constructor() {
-        this.queue = new Queue<Emission>();
+        this.queue = new Queue();
     }
 
     /**
@@ -60,7 +60,7 @@ export class Reactor<Emission = unknown> {
      */
     public async * stream(): AsyncGenerator<Emission> {
         while (true) {
-            yield await this.next();
+            yield await this.continue();
         }
     }
 }

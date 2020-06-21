@@ -13,7 +13,7 @@ export declare class Reactor<Emission = unknown> {
     /**
      * Asynchronously process next emission
      */
-    private next;
+    private continue;
     /**
      * Stream emission
      * @param emission Emission to stream
