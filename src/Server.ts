@@ -1,18 +1,18 @@
 import * as NodeWebSocket from 'ws';
 
-import { Reactor } from './Reactor';
-import { Socket } from './Socket';
+import { Reactor } from './Reactor'
+import { Socket } from './Socket'
 
 export class Server extends Reactor<Socket> {
     
-    private server: NodeWebSocket.Server;
+    private server: NodeWebSocket.Server
 
     public listen(port: number): void {
-        this.server = new NodeWebSocket.Server({ port });
+        this.server = new NodeWebSocket.Server({ port })
         
-        this.server.on('connection', async connection => {
-            this.emit(new Socket(connection));
-        });
+        this.server.on('connection', connection => {
+            this.emit(new Socket(connection))
+        })
     }
 }
 

@@ -3,48 +3,48 @@ import { Queue } from "./Queue";
 /**
  * Observable implemented with async generators
  */
-export class Reactor<Emission = unknown> {
+export class Reactor<Result = unknown> {
 
     /**
      * Promise resolver used to hold the stream in place while awaiting new emission
      */
-    private marker?: (emission: Emission) => void;
+    private cursor?: (result: Result) => void;
 
     /**
-     * Queue in which emissions are held
+     * Queue to hold incoming results
      */
-    private queue: Queue<Emission>;
+    private results: Queue<Result>;
 
     /**
-     * Asynchronously process next emission
+     * Asynchronously process next result
      */
-    private async continue(): Promise<Emission> {
+    private async continue(): Promise<Result> {
 
         /**
-         * If queue is empty, save marker while awaiting new emission
+         * If queue is empty, save cursor while awaiting new emission
          */
-        if (!this.queue.size) {
-            return new Promise(resolve => this.marker = resolve);
+        if (!this.results.size) {
+            return new Promise(resolve => this.cursor = resolve);
         }
 
-        return Promise.resolve(this.queue.dequeue());
+        return Promise.resolve(this.results.dequeue());
     }
 
     /**
-     * Stream emission
-     * @param emission Emission to stream
+     * Emit a result
+     * @param result Result to process
      */
-    protected async emit(emission: Emission): Promise<void> {
+    protected async emit(result: Result): Promise<void> {
 
         /**
          * If stream awaiting next value, release marker
          */
-        if (this.marker) {
-            this.marker(emission);
-            this.marker = undefined;
+        if (this.cursor) {
+            this.cursor(result);
+            this.cursor = undefined;
         }
         else {
-            this.queue.enqueue(emission);
+            this.results.enqueue(result);
         }
     }
 
@@ -52,25 +52,15 @@ export class Reactor<Emission = unknown> {
      * Initialize queue
      */
     public constructor() {
-        this.queue = new Queue();
+        this.results = new Queue();
     }
 
     /**
-     * Observe emissions
+     * Observe incoming results
      */
-    public async * stream(): AsyncGenerator<Emission> {
+    public async * stream(): AsyncGenerator<Result> {
         while (true) {
             yield await this.continue();
         }
-    }
-}
-
-export namespace Reactor {
-
-    /**
-     * Interface for reactors which may wish to relay emissions to other reactors
-     */
-    export interface Relay<Emission = unknown> {
-        relay(emission: Emission): void;
     }
 }

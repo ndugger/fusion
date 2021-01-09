@@ -1,11 +1,12 @@
 import * as NodeWebSocket from 'ws';
 
 import { Reactor } from './Reactor';
+import { Relay } from './Relay'
 
 /**
  * Abstracts web socket client
  */
-export class Socket extends Reactor<Socket.Packet> implements Reactor.Relay {
+export class Socket extends Reactor<Relay.Packet> implements Relay {
 
     private connection: WebSocket | NodeWebSocket;
 
@@ -15,21 +16,21 @@ export class Socket extends Reactor<Socket.Packet> implements Reactor.Relay {
         if (addressOrSocket instanceof NodeWebSocket) {
             this.connection = addressOrSocket;
 
-            this.connection.on('error', error => {
+            this.connection.on('error', (error: Error) => {
                 this.emit({
-                    action: Socket.Action.Error,
-                    details: error
+                    type: Socket.Action.Error,
+                    data: error
                 });
             });
 
-            this.connection.on('message', data => {
-                this.emit(JSON.parse(data as string));
+            this.connection.on('message', (message: string) => {
+                this.emit(JSON.parse(message));
             });
 
-            this.connection.on('open', event => {
+            this.connection.on('open', (event: Event) => {
                 this.emit({
-                    action: Socket.Action.Open,
-                    details: event
+                    type: Socket.Action.Open,
+                    data: event
                 });
             });
 
@@ -39,42 +40,42 @@ export class Socket extends Reactor<Socket.Packet> implements Reactor.Relay {
         if ('WebSocket' in globalThis) {
             this.connection = new WebSocket(addressOrSocket);
 
-            this.connection.addEventListener('error', event => {
+            this.connection.addEventListener('error', (event: ErrorEvent) => {
                 this.emit({
-                    action: Socket.Action.Error,
-                    details: event
+                    type: Socket.Action.Error,
+                    data: event
                 });
             });
 
-            this.connection.addEventListener('message', event => {
+            this.connection.addEventListener('message', (event: MessageEvent) => {
                 this.emit(JSON.parse(event.data));
             });
 
-            this.connection.addEventListener('open', event => {
+            this.connection.addEventListener('open', (event: Event) => {
                 this.emit({
-                    action: Socket.Action.Open,
-                    details: event
+                    type: Socket.Action.Open,
+                    data: event
                 });
             });
         }
         else {
             this.connection = new NodeWebSocket(addressOrSocket);
 
-            this.connection.on('error', error => {
+            this.connection.on('error', (error: Error) => {
                 this.emit({
-                    action: Socket.Action.Error,
-                    details: error
+                    type: Socket.Action.Error,
+                    data: error
                 });
             });
 
-            this.connection.on('message', data => {
-                this.emit(JSON.parse(data as string));
+            this.connection.on('message', (message: string) => {
+                this.emit(JSON.parse(message as string));
             });
 
-            this.connection.on('open', event => {
+            this.connection.on('open', (event: Event) => {
                 this.emit({
-                    action: Socket.Action.Open,
-                    details: event
+                    type: Socket.Action.Open,
+                    data: event
                 });
             });
         }
@@ -83,12 +84,11 @@ export class Socket extends Reactor<Socket.Packet> implements Reactor.Relay {
     public close(): void {
         this.connection.close();
         this.emit({ 
-            action: Socket.Action.Close, 
-            details: undefined 
+            type: Socket.Action.Close
         });
     }
 
-    public relay(packet: Socket.Packet): void {
+    public relay(packet: Relay.Packet): void {
         this.connection.send(JSON.stringify(packet));
     }
 }
@@ -99,10 +99,5 @@ export namespace Socket {
         Close = 'socket_close',
         Error = 'socket_error',
         Open = 'socket_open'
-    }
-
-    export interface Packet<Details = unknown> {
-        action: string;
-        details: Details;
     }
 }
